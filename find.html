@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html >
+  <meta charset="utf-8">
+<head>
+  <style> body { margin: 0; } 
+  
+  
+  
+  
+  
+  </style>
+
+  <script src="static/src/three-0.141.0.js"></script>
+  <script src="static/src/three-spritetext.min-1.6.5.js"></script>
+
+  <script src="static/src/3d-force-graph-1.70.1.js"></script>
+  <!--<script src="../../dist/3d-force-graph.js"></script>-->
+</head>
+
+<!-- <body>
+  <div id="3d-graph"></div>
+
+  <script>
+    const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+        .jsonUrl('./static/datasets/test_data.json')
+        .nodeAutoColorBy('group')
+
+        .nodeLabel('id')
+        .nodeAutoColorBy('group')
+        .linkOpacity([1])
+
+
+        .nodeThreeObject(node => {
+          const sprite = new SpriteText(node.id);
+          sprite.material.depthWrite = false; // make sprite background transparent
+          sprite.color = node.color;
+          sprite.textHeight = 8;
+          return sprite;
+        });
+
+    // Spread nodes a little wider
+    Graph.d3Force('charge').strength(-120);
+
+  </script>
+</body>
+ -->
+
+ <body>
+  <div id="3d-graph"></div>
+<!-- <input type="text" name="search" id="s"><input type="button" onclick="SearchFunction()" value="search" id="b">
+ -->
+
+
+
+
+<div style="position: absolute; top: 20px; right: 20px;">
+  <input id="s"  style="margin: 32px; height: 100px; width: 450px; font-size: 40px;">
+  search
+
+  <button id="b"  style="margin: 32px; height: 100px; width: 450px;font-size: 40px;">
+    search
+
+</div>
+
+
+
+
+
+
+
+
+  <script>
+
+
+    const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+        .jsonUrl('./static/datasets/test_data.json')
+        .nodeLabel('id')
+        .nodeAutoColorBy('group')
+        .linkThreeObjectExtend(true)
+        .linkOpacity([0.6])
+        .linkWidth([1])
+        .linkThreeObject(link => {
+          // extend link with text sprite
+          const sprite = new SpriteText(`${link.name}`);
+          sprite.color = 'lightgrey';
+          sprite.textHeight = 3;
+          return sprite;
+        })
+
+        .nodeThreeObject(node => {
+          const sprite = new SpriteText(node.id);
+          sprite.material.depthWrite = false; // make sprite background transparent
+          sprite.color = node.color;
+          sprite.textHeight = 8;
+          // sprite.scale.set(10, 5, 1 );
+
+
+//////////////////////
+document.getElementById('b').addEventListener('click', event => {
+
+  
+var inputDom = document.getElementById("s");
+var text = inputDom.value;
+
+if (text===node.id){
+
+
+
+          console.log("------------------");
+          console.log(text);
+          console.log("------------------");
+          console.log(node.id);
+  
+          // Aim at node from outside it
+          const distance = 40;
+          const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+          console.log(node.id);
+
+          const newPos = node.x || node.y || node.z
+            ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
+            : { x: 0, y: 0, z: distance }; // special case if node is in (0,0,0)
+
+          Graph.cameraPosition(
+            newPos, // new position
+            node, // lookAt ({ x, y, z })
+            3000  // ms transition duration
+          );
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+///////////////////////////
+
+          return sprite;
+        })
+
+
+
+
+
+        .linkPositionUpdate((sprite, { start, end }) => {
+          const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
+            [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
+          })));
+
+          // Position sprite
+          Object.assign(sprite.position, middlePos);
+        })
+        
+        .onNodeClick(node => {
+          // Aim at node from outside it
+          const distance = 40;
+          const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+          console.log(node.id);
+
+          const newPos = node.x || node.y || node.z
+            ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
+            : { x: 0, y: 0, z: distance }; // special case if node is in (0,0,0)
+
+          Graph.cameraPosition(
+            newPos, // new position
+            node, // lookAt ({ x, y, z })
+            3000  // ms transition duration
+          );
+        })
+        
+        
+        ;      
+
+
+        const distance = 1400;
+         // camera orbit
+        let angle = 0;
+
+    
+
+
+
+
+
+
+
+
+        
+        
+
+    // Spread nodes a little wider
+    Graph.d3Force('charge').strength(-120);
+
+  </script>
+</body>
+
+</html>
+
