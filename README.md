@@ -156,3 +156,41 @@ entity_type_group_dir = {
 }
 
 ```
+
+
+
+
+
+# import
+
+
+
+
+```
+
+from neo4j import GraphDatabase
+ 
+# 连接Neo4j数据库
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password"))
+ 
+# 创建一个会话
+with driver.session() as session:
+    # 准备CSV文件中的数据
+    csv_data = """
+    Node1,Node2
+    Label1,Label2
+    Data1,Data2
+    """
+ 
+    # 执行LOAD CSV命令
+    session.run("""
+        LOAD CSV WITH HEADERS FROM {csv} AS row
+        CREATE (n:Label {key: row.Node1, value: row.Node2})
+    """, csv=csv_data)
+ 
+# 关闭驱动
+driver.close()
+
+
+
+```
