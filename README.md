@@ -196,49 +196,175 @@ driver.close()
 ```
 ```html
 
-!doctype html>
+
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
-        <title>neo4jd3.js</title>
-        <link rel="stylesheet" href="css/bootstrap.min.css" rel="external nofollow" >
-        <link rel="stylesheet" href="css/font-awesome.min.css" rel="external nofollow" >
-        <link rel="stylesheet" href="css/neo4jd3.min.css?v=0.0.1" rel="external nofollow" >
-        <script src="js/d3.min.js"></script>
-        <script src="js/2.js?v=0.0.2"></script>
-        <style>
-            body,
-            html,
-            .neo4jd3 {
-                height: 100%;
-                overflow: hidden;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="neo4jd33"></div>
-        <!-- Scripts -->
-        <script type="text/javascript" >
+<head>
+    <meta charset="utf-8">
+    <title>Force</title>
+    <style>
  
-            function init() {
-                  
-                var neo4jd3 = new Neo4jd3('#neo4jd33', {
-                    icons: {
-                    },
-                    images: {
-                         'person': 'img/twemoji/wode.png',
-                    minCollision: 50,
-                    neo4jDataUrl:'./json/mydata.json',
-                    nodeRadius: 30,
-                    zoomFit: false
-                });
-            window.onload = init;
-        </script>
-        <script>
-    </body>
+        .nodetext {
+            font-size: 12px ;
+            font-family: SimSun;//字体
+            fill:#000000;
+        }
+        .linetext {
+            /*font-family: SimSun;*/
+            fill:#1f77b4;
+            fill-opacity:0.0;
+        .circleImg {
+            stroke: #ff7f0e;
+            stroke-width: 1.5px;
+    </style></head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    var width = 900;
+    var height = 800;
+    var img_w = 77;
+    var img_h = 80;
+    var radius = 30;    //圆形半径
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width",width)
+        .attr("height",height);
+    var edges = [];
+    d3.json("my.json",function(error,root){
+        if( error ){
+            return console.log(error);
+        console.log(root);
+//默认按索引链接结点,我强制改成通过id链接它们。
+        root.edges.forEach(function (e) {
+                var sourceNode = root.nodes.filter(function (n) {
+                        return n.id === e.source;
+                    })[0],
+                    targetNode = root.nodes.filter(function (n) {
+                        return n.id === e.target;
+                    })[0];
+                edges.push({
+                 source: sourceNode,
+                 target: targetNode,
+                 relation: e.type
+                })
+        });
+console.log(edges)
+        //D3力导向布局
+        var force = d3.layout.force()
+            .nodes(root.nodes)
+            .links(edges)
+            .size([width,height])
+            .linkDistance(200)
+            .charge(-1500)
+            .start();
+        var defs = svg.append("defs");
+        var arrowMarker = defs.append("marker")
+            .attr("id","arrow")
+            .attr("markerUnits","strokeWidth")//图最前端大小
+            .attr("markerWidth","15")//标识长宽
+            .attr("markerHeight","15")
+            .attr("viewBox","0 0 12 12")//坐标系区域
+            .attr("refX","17")
+            .attr("refY","6")
+            .attr("orient","auto");//方向
+        var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
+        arrowMarker.append("path")
+            .attr("d",arrow_path)
+            .attr("fill","#ccc");
+        //边
+        var edges_line =svg.selectAll("line")
+            .data(edges)
+            .enter()
+            .append("line")
+            .attr("class","line")
+            .style("stroke","#ddd")
+            .style("linewidth",2)
+            .attr("marker-end","url(#arrow)")
+            .style("stroke-width",3);
+        //边上的文字（人物之间的关系）
+        var edges_text = svg.selectAll(".linetext")
+            .append("text")
+            .attr("class","linetext")
+            .text(function(d){
+                return d.relation;
+            })
+            .style("fill-opacity",1.0);//不透明度
+        // 圆形图片节点（人物头像）
+        var nodes_img = svg.selectAll("image")
+            .data(root.nodes)
+            .append("circle")
+            .attr("class", "circleImg")
+            .attr("r", radius)
+            .attr("fill", function(d, i){
+                //创建圆形图片
+                var defs = svg.append("defs").attr("id", "imgdefs")
+                var catpattern = defs.append("pattern")
+                    .attr("id", "catpattern" + i)
+                    .attr("height", 1)
+                    .attr("width", 1)
+                catpattern.append("image")
+                    .attr("x", - (img_w / 2 - radius))
+                    .attr("y", - (img_h / 2 - radius))
+                    .attr("width", img_w)
+                    .attr("height", img_h)
+                    .attr("xlink:href", d.labels)
+                return "url(#catpattern" + i + ")";
+            // .on("mouseover",function(d,i){
+            //     //显示连接线上的文字
+            //     edges_text.style("fill-opacity",function(edge){
+            //         if( parseInt(edge.source) === d || parseInt(edge.target) === d ){
+            //             return 1.0;
+            //         }
+            //     });
+            // })
+            // .on("mouseout",function(d,i){
+            //     //隐去连接线上的文字
+            //         if( edge.source === d || edge.target === d ){
+            //             return 0.0;
+            .call(force.drag);
+        var text_dx = -20;
+        var text_dy = 20;
+        var nodes_text = svg.selectAll(".nodetext")
+            .style("stroke","#ff7f0e")
+            .attr("class","nodetext")
+            .attr("dx",text_dx)
+            .attr("dy",text_dy)
+                var uservalue = d.properties.username;
+                var personvalue = d.properties.person;
+                var phonevalue = d.properties.phone;
+                if ( uservalue == undefined ){
+                    uservalue = "";
+                }
+                if(personvalue == undefined){
+                    personvalue = "";
+                if (phonevalue == undefined){
+                    phonevalue = "";
+                return uservalue + phonevalue + personvalue;
+            });
+        force.on("tick", function(){
+            //限制结点的边界
+            root.nodes.forEach(function(d,i){
+                d.x = d.x - img_w/2 < 0     ? img_w/2 : d.x ;
+                d.x = d.x + img_w/2 > width ? width - img_w/2 : d.x ;
+                d.y = d.y - img_h/2 < 0      ? img_h/2 : d.y ;
+                d.y = d.y + img_h/2 + text_dy > height ? height - img_h/2 - text_dy : d.y ;
+            //更新连接线的位置
+            edges_line.attr("x1",function(d){ return d.source.x; });
+            edges_line.attr("y1",function(d){ return d.source.y; });
+            edges_line.attr("x2",function(d){ return d.target.x; });
+            edges_line.attr("y2",function(d){ return d.target.y; });
+            //更新连接线上文字的位置
+            edges_text.attr("x",function(d){ return (d.source.x + d.target.x) / 2 ; });
+            edges_text.attr("y",function(d){ return (d.source.y + d.target.y) / 2 ; });
+            //更新结点图片和文字
+            nodes_img.attr("cx",function(d){ return d.x });
+            nodes_img.attr("cy",function(d){ return d.y });
+            nodes_text.attr("x",function(d){ return d.x });
+            nodes_text.attr("y",function(d){ return d.y + img_w/2; });
+    });
+</script>
+</body>
 </html>
 
 
