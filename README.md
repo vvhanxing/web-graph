@@ -194,3 +194,52 @@ driver.close()
 
 
 ```
+```html
+
+!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <title>neo4jd3.js</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" rel="external nofollow" >
+        <link rel="stylesheet" href="css/font-awesome.min.css" rel="external nofollow" >
+        <link rel="stylesheet" href="css/neo4jd3.min.css?v=0.0.1" rel="external nofollow" >
+        <script src="js/d3.min.js"></script>
+        <script src="js/2.js?v=0.0.2"></script>
+        <style>
+            body,
+            html,
+            .neo4jd3 {
+                height: 100%;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="neo4jd33"></div>
+        <!-- Scripts -->
+        <script type="text/javascript" >
+ 
+            function init() {
+                  
+                var neo4jd3 = new Neo4jd3('#neo4jd33', {
+                    icons: {
+                    },
+                    images: {
+                         'person': 'img/twemoji/wode.png',
+                    minCollision: 50,
+                    neo4jDataUrl:'./json/mydata.json',
+                    nodeRadius: 30,
+                    zoomFit: false
+                });
+            window.onload = init;
+        </script>
+        <script>
+    </body>
+</html>
+
+
+```
