@@ -369,3 +369,104 @@ console.log(edges)
 
 
 ```
+
+
+```html
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@baklavajs/themes@2.0.2-beta.3/dist/syrup-dark.css" />
+        <style>
+            html,
+            body {
+                margin: 0;
+            }
+
+            #editor {
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="editor"></div>
+
+        <script src="./static/cdn.jsdelivr.net_npm_baklavajs@2.0.2-beta.3_dist_bundle.js"></script>
+        <script>
+            const viewModel = BaklavaJS.createBaklava(document.getElementById("editor"));
+            const PromptNode = BaklavaJS.Core.defineNode({
+                type: "PlanerNode",
+                inputs: {
+                    input1: () => new BaklavaJS.RendererVue.TextInputInterface("Hello", "world"),
+                    input2: () => new BaklavaJS.RendererVue.TextInputInterface("Hello", "world"),
+                    operation: () => new BaklavaJS.RendererVue.SliderInterface("Name", 0.5, 0, 1),
+                },
+                outputs: {
+                    ouput1: () => new BaklavaJS.RendererVue.TextInputInterface("Hello", "world"),
+                },
+            });
+
+            const SkillNode = BaklavaJS.Core.defineNode({
+                type: "SkillNode",
+                inputs: {
+                    input1: () => new BaklavaJS.RendererVue.TextInputInterface("Hello", "world"),
+                },
+                outputs: {
+                    ouput1: () => new BaklavaJS.RendererVue.TextInputInterface("Hello", "world"),
+                },
+            });
+
+            const MathNode = BaklavaJS.Core.defineNode({
+                type: "MathNode",
+                inputs: {
+                    number1: () => new BaklavaJS.RendererVue.NumberInterface("Number", 1),
+                    number2: () => new BaklavaJS.RendererVue.NumberInterface("Number", 10),
+                    operation: () => new BaklavaJS.RendererVue.SelectInterface("Operation", "Add", ["Add", "Subtract"]).setPort(false),
+                    },
+                outputs: {
+                    output: () => new BaklavaJS.RendererVue.NumberInterface("Output", 0),
+                    },
+                calculate({ number1, number2, operation }) {
+                    let output = number;
+                    if (operation === "Add") {
+                        output = number1 + number2;
+                    } else if (operation === "Subtract") {
+                        output = number1 - number2;
+                    } else {
+                        throw new Error("Unknown operation: " + operation);
+                    }
+                    console.log(output);
+                    return { output };
+                },
+            });
+
+            const Display = BaklavaJS.Core.defineNode({
+                type: "Display",
+                inputs: {
+                    Value: () => new BaklavaJS.RendererVue.NumberInterface("Number", 0),
+                    },
+                    
+                calculate(Value) {
+                   
+                    console.log(Value);
+                }
+            });
+            
+            
+
+            viewModel.editor.registerNodeType(PromptNode);
+            viewModel.editor.registerNodeType(SkillNode);
+            viewModel.editor.registerNodeType(MathNode);
+            viewModel.editor.registerNodeType(Display);
+        </script>
+    </body>
+</html>
+
+```
+
